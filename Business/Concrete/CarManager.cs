@@ -65,10 +65,11 @@ namespace Business.Concrete
 
         public void Update(Car car)
         {
-            if (car.DailyPrice > 0)
-                _carDal.Add(car);
+            if (car.DailyPrice > 0 && car.Description.Length > 2)
+                _carDal.Update(car);
             else
                 new Exception();
+           
         }
     }
 }
