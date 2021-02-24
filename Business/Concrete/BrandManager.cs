@@ -1,4 +1,8 @@
 ﻿using Business.Abstract;
+using Business.Constans;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
+using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using System;
@@ -10,36 +14,46 @@ namespace Business.Concrete
     public class BrandManager : IBrandService
     {
         IBrandDal _brandDal;
+
+
         public BrandManager(IBrandDal brandDal)
         {
             _brandDal = brandDal;
         }
-        public void Add(Brand car)
+
+
+        [ValidationAspect(typeof(BrandValidator))]
+        public IResult Add(Brand car)
         {
             _brandDal.Add(car);
+            return new SuccessResult(Messages.BrandAdded);
         }
 
-        public void Delete(Brand car)
+        public IResult Delete(Brand car)
         {
             _brandDal.Delete(car);
+            return new SuccessResult(Messages.BrandDeleted);
         }
 
-        public List<Brand> GetAll()
+        public IDataResult<List<Brand>> GetAll()
         {
-            return _brandDal.GetAll();
+            return new SuccessDataResult<List<Brand>>( _brandDal.GetAll());
         }
 
-        public Brand GetById(int id)
+        public IDataResult<Brand> GetById(int id)
         {
-            return _brandDal.Get(p=>p.BrandId==id);
+            return  new SuccessDataResult<Brand>(_brandDal.Get(p=>p.BrandId==id));
         }
 
-        public void Update(Brand brand)
+        public IResult Update(Brand brand)
         {
             if (brand.BrandName.Length > 2)
+            {
                 _brandDal.Update(brand);
+                return new SuccessResult(Messages.BrandAdded);
+            }
             else
-                new Exception();
+                return new ErrorResult(Messages.BrandInvalid);
         }
     }
 }
